@@ -27,6 +27,7 @@ dependencies:
   path_provider:
   sqflite:
   http:
+  flame: ^0.28.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -54,6 +55,9 @@ flutter:
     - assets/images/brasil.svg
     - assets/images/alemanha.svg
     - assets/images/apple.png
+    - assets/images/spaceship.png
+    - assets/images/dragon.png
+    - assets/images/bullet.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

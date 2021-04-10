@@ -1,4 +1,4 @@
-  import 'package:base/components/Resultadojogo.dart';
+import 'package:base/components/Resultadojogo.dart';
 import 'package:flutter/material.dart';
 
 class PlacarJogo extends StatelessWidget {
@@ -21,7 +21,7 @@ class PlacarJogo extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(right: 2.0),
                       child: Image.asset(
-                        'assets/images/gato.png',
+                        'assets/images/apple.png',
                         height: 40,
                         width: 40,
                       ),
@@ -33,7 +33,7 @@ class PlacarJogo extends StatelessWidget {
                 children: [
                   Column(
                     children: [
-                      Text(this.resultado.pais1,
+                      Text(this.resultado.adversario1,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20)),
@@ -70,7 +70,7 @@ class PlacarJogo extends StatelessWidget {
                   //Alemanha
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(this.resultado.pais2,
+                    Text(this.resultado.adversario2,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20)),
@@ -97,3 +97,4 @@ class PlacarJogo extends StatelessWidget {
     );
   }
 }
+  

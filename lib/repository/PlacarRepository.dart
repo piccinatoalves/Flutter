@@ -12,7 +12,7 @@ class PlacarRepository {
   static _dataBaseManager() async {
     final int versiondb = 1;
     final pathDatabase = await getDatabasesPath();
-    final localDatabase = join(pathDatabase, "jogos.db");
+    final localDatabase = join(pathDatabase, "jogos2.db");
     var bd = await openDatabase(localDatabase, version: versiondb,
         onCreate: (db, versiondb) {
       String sql =
@@ -21,12 +21,13 @@ class PlacarRepository {
     });
     return bd;
   }
-    static save(ResultadoJogo resultado) async {
+
+  static save(ResultadoJogo resultado) async {
     Database bd = await _dataBaseManager();
 
     Map<String, dynamic> dadosResultado = {
-      "pais1": resultado.pais1,
-      "pais2": resultado.pais2,
+      "pais1": resultado.adversario1,
+      "pais2": resultado.adversario2,
       "resultado1": resultado.resultado1,
       "resultado2": resultado.resultado2
     };
@@ -34,29 +35,38 @@ class PlacarRepository {
     int id = await bd.insert("jogos", dadosResultado);
     print("salvou $id");
   }
-    static Future list() async {
+
+  static Future list() async {
     Database bd = await _dataBaseManager();
     List listaTesultados = await bd.rawQuery("select * from jogos");
 
     var _jogos = new List();
     for (var item in listaTesultados) {
-      _jogos.add(new ResultadoJogo(item['pais1'], item['pais2'],
-          item['resultado1'], item['resultado2']));
+      var result = new ResultadoJogo(
+          item['pais1'], item['pais2'], item['resultado1'], item['resultado2']);
+      result.id = item['id'];
+      _jogos.add(result);
     }
 
     return _jogos;
   }
+
   static update(ResultadoJogo resultado) async {
     Database bd = await _dataBaseManager();
 
     Map<String, dynamic> dadosResultado = {
-      "pais1": resultado.pais1,
-      "pais2": resultado.pais2,
+      "pais1": resultado.adversario1,
+      "pais2": resultado.adversario2,
       "resultado1": resultado.resultado1,
       "resultado2": resultado.resultado2
     };
 
     bd.update("jogos", dadosResultado,
         where: "id = ?", whereArgs: [resultado.id]);
+  }
+  
+    static delete(int resultadoId) async {
+    Database db = await _dataBaseManager();
+    return await db.delete('jogos', where: 'id = ?', whereArgs: [resultadoId]);
   }
 }

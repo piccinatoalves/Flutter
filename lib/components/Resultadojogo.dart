@@ -1,11 +1,18 @@
-class ResultadoJogo {
+  class ResultadoJogo {
   int id;
-  String pais1;
-  String pais2;
+  String adversario1;
+  String adversario2;
   String resultado1;
   String resultado2;
 
-  ResultadoJogo(this.pais1,this.pais2,this.resultado1,this.resultado2);
+  ResultadoJogo.empty() {
+    id = null;
+    adversario1 = "";
+    adversario2 = "";
+    resultado1 = "0";
+    resultado2 = "0";
+  }
 
-
+  ResultadoJogo(
+      this.adversario1, this.adversario2, this.resultado1, this.resultado2);
 }

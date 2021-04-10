@@ -1,4 +1,4 @@
-import 'package:base/components/PlacarJogo.dart';
+import 'package:base/components/Placarjogo.dart';
 import 'package:base/components/Resultadojogo.dart';
 import 'package:base/repository/PlacarRepository.dart';
 import 'package:flutter/material.dart';
@@ -46,29 +46,98 @@ class _MyAppState extends State<_Lista> {
                 await Navigator.push(
                     context,
                     new MaterialPageRoute(
-                        builder: (context) => CadastroView()));
+                        builder: (context) =>
+                            CadastroView(ResultadoJogo.empty())));
                 print(_resultados.length);
                 setState(() {});
               },
             )
           ],
         ),
-          body: Container(
+        body: Container(
           child: FutureBuilder(
               future: PlacarRepository.list(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 }
+
                 return ListView.builder(
                     itemCount: snapshot.data.length,
                     itemBuilder: (context, index) {
-                      return new Card(
-                        child: PlacarJogo(snapshot.data[index]),
+                      return GestureDetector(
+                        child: new Card(
+                          child: PlacarJogo(snapshot.data[index]),
+                        ),
+                        onTap: () {
+                          _showMenuOption(context, snapshot.data[index]);
+                        },
                       );
                     });
               }),
         ),
+      ),
+    );
+  }
+
+  void _showMenuOption(BuildContext context, ResultadoJogo resultado) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            padding: EdgeInsets.all(10),
+            height: 200,
+            color: Colors.blue[200],
+            child: Column(
+              children: [
+                _button("Editar", context, () async {
+                  Navigator.pop(context);
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CadastroView(resultado)));
+                  setState(() {});
+                }),
+                _button("Excluir", context, () {
+                  Navigator.pop(context);
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Ola dialog"),
+                          content: Text("Ola conent"),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('Approve'),
+                              onPressed: () {
+                                PlacarRepository.delete(resultado.id);
+                                setState(() {});
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      });
+                }),
+                _button("fechar", context, () {
+                  Navigator.pop(context);
+                })
+              ],
+            ),
+          );
+        });
+  }
+
+  Widget _button(title, context, function) {
+    return Padding(
+      padding: EdgeInsets.all(5.0),
+      child: FlatButton(
+        color: Colors.red,
+        child: Text(
+          title,
+          style: TextStyle(color: Colors.yellow, fontSize: 20.0),
+        ),
+        onPressed: function,
       ),
     );
   }
@@ -103,14 +172,22 @@ class ResultadoView extends StatelessWidget {
 }
 
 class CadastroView extends StatelessWidget {
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+  final ResultadoJogo resultado;
+  final TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final pais1 = TextEditingController();
   final placar1 = TextEditingController();
   final pais2 = TextEditingController();
   final placar2 = TextEditingController();
 
+  CadastroView(this.resultado);
+
   @override
   Widget build(BuildContext context) {
+    pais1.text = resultado.adversario1;
+    placar1.text = resultado.resultado1;
+    pais2.text = resultado.adversario2;
+    placar2.text = resultado.resultado2;
+
     return Scaffold(
         appBar: AppBar(
           title: Text("Resultado"),
@@ -172,13 +249,20 @@ class CadastroView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(32.0))),
               ),
               RaisedButton(
-                child: Text("Novo Placar"),
+                child: Text(
+                    resultado.id == null ? "Novo Placar" : "Atualiza Placar"),
                 onPressed: () {
-                  var novoResultado =
-                      new ResultadoJogo(pais1.text, pais2.text, placar1.text, placar2.text);
-                  _resultados.add(novoResultado);
-                  PlacarRepository.save(novoResultado);
+                  resultado.adversario1 = pais1.text;
+                  resultado.adversario2 = pais2.text;
+                  resultado.resultado1 = placar1.text;
+                  resultado.resultado2 = placar2.text;
 
+                  // _resultados.add(novoResultado);
+                  if (resultado.id == null) {
+                    PlacarRepository.save(resultado);
+                  } else {
+                    PlacarRepository.update(resultado);
+                  }
                   Navigator.of(context).pop();
                 },
                 color: Colors.red,
@@ -189,12 +273,5 @@ class CadastroView extends StatelessWidget {
             ],
           ),
         ));
-
-    // Passo 1: Capturar os dados digitados nos campos
-    // Passo 2: Inclurir um novo objeto na Lista
-    // Passo 3: Voltar para a lista
-    //  Navigator.of(context).pop();
-    // Passo 4: ao retornar a lista, atualizar o estado do componente
-    // setState(() {});
   }
 }
